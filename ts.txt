@@ -1,0 +1,8 @@
+NOMBRE | TOKEN | TIPO | VALOR | LONG
+Aa1 | ID | null | null | 0
+12 | C_INT | null | 12 | 0
+11 | C_INT | null | 11 | 0
+20 | C_INT | null | 20 | 0
+72 | C_INT | null | 72 | 0
+Dd1 | ID | null | null | 0
+3.14 | C_REAL | null | 3.14 | 0

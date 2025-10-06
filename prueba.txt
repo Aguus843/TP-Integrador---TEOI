@@ -1,0 +1,5 @@
+Aa1 = 12
+IF INLIST(Aa1,[11;20:12;72]) THEN
+    Dd1 = 3.14
+END IF
+
