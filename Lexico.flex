@@ -79,7 +79,7 @@ COMENTARIO  = \#([^#]*)\#
        if (contenido.length() > 30) {
           throw new Error("Error: cadena demasiado larga (máx 30 caracteres): " + yytext() + " en la línea " + yyline);
        }
-       tablaSimbolos.agregar(contenido, "C_STRING", contenido, contenido.length());
+       tablaSimbolos.agregar("_" + contenido, "C_STRING", contenido, contenido.length());
        System.out.println("Token C_STRING encontrado, Lexema "+ yytext());
     }
 
