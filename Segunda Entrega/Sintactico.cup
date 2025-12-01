@@ -1,0 +1,363 @@
+package lexicoparte1;
+
+import java.util.ArrayList;
+import java.util.List;
+import java_cup.runtime.*;
+
+parser code
+{:
+    /** Metodo llamado automáticamente ante un error sintáctico. */
+    public void syntax_error(Symbol s){
+        System.out.println("Error en la linea " + (s.right+1) + " columna " + s.left + ". "
+            + s + " no reconocido. valor " + s.value );
+    }
+:}
+
+action code
+{:
+:}
+
+/* Declaracion de Terminales */
+terminal REPEAT, IF, THEN, ELSE, MOSTRAR, DECVAR, ENDDECVAR, IP, FP, INLIST, END, INT, REAL, STRING, ID, ASIGNAR, C_INT, C_REAL, C_STRING,
+         HEX, SUMA, MENOS, MULT, DIV, APARENT, CPARENT, PYC, COMA, MENOR, MENORIGUAL, MAYOR, MAYORIGUAL, DOSPUNTOS, IGUAL, DISTINTO,
+         AND, OR, ACORCHETE, CCORCHETE, WHILE;
+
+/* Declaracion de No Terminales */
+non terminal pgm, declaracion, lista_decl, decl, tipo, sentencia,
+            asignacion, iteracion, seleccion, condicion,
+            comparacion, comparador, lista_valores, mostrar_sin_id, mostrar, lista_mostrar;
+
+non terminal programa, lista_expresiones, expresion, termino, factor;
+
+/* Precedencia para resolver dangling-else */
+precedence nonassoc ELSE;
+precedence left OR;
+precedence left AND;
+
+/* Símbolo inicial */
+start with pgm;
+
+pgm ::= declaracion:d programa:p 
+    {: 
+        System.out.println("pgm Regla 0 Compila correctamente llegando al simbolo start");
+        RESULT = p;
+    :};
+
+pgm ::= lista_mostrar  {: 
+        System.out.println("pgm Regla 0 Compila correctamente llegando al simbolo start");
+    :};
+
+lista_mostrar ::= mostrar_sin_id {: 
+        System.out.println("[Regla 42] Mostrar");
+    :};
+
+lista_mostrar ::= lista_mostrar mostrar_sin_id {: 
+        System.out.println("[Regla 43] Lista mostrar");
+    :};
+
+mostrar_sin_id ::= MOSTRAR APARENT C_INT:ent CPARENT  
+    {: 
+        System.out.println("[Regla 44] Mostrar C_INT = " + ent);
+        RESULT = String.valueOf(ent);
+    :};
+    
+mostrar_sin_id ::= MOSTRAR APARENT C_REAL:real CPARENT  
+    {: 
+        System.out.println("[Regla 45] Mostrar C_REAL = " + real);
+        RESULT = String.valueOf(real);
+    :};
+    
+mostrar_sin_id ::= MOSTRAR APARENT C_STRING:str CPARENT  
+    {: 
+        System.out.println("[Regla 46] Mostrar C_STRING = " + str);
+        RESULT = String.valueOf(str);
+    :};
+    
+mostrar_sin_id ::= MOSTRAR APARENT HEX:h CPARENT  
+    {: 
+        System.out.println("[Regla 47] Mostrar HEX = " + h);
+        RESULT = String.valueOf(h);
+    :};
+
+declaracion ::= DECVAR lista_decl:ld ENDDECVAR 
+    {: 
+        System.out.println("[Regla 1] Declaracion de variables"); 
+        RESULT = ld;
+    :};
+
+lista_decl ::= lista_decl:ld decl:d 
+    {: 
+        System.out.println("[Regla 2] Lista de declaraciones");
+        RESULT = ld;
+    :};
+    
+lista_decl ::= decl:d 
+    {: 
+        System.out.println("[Regla 3] Declaracion");
+        RESULT = d;
+    :};
+
+decl ::= ID:id DOSPUNTOS tipo:t 
+    {: 
+        System.out.println("[Regla 4] Declaracion de variable: " + id + " : " + t);
+        RESULT = id;
+    :};
+
+tipo ::= INT 
+    {: 
+        System.out.println("[Regla 5] Tipo entero");
+        RESULT = "INT";
+    :};
+    
+tipo ::= REAL 
+    {: 
+        System.out.println("[Regla 6] Tipo real");
+        RESULT = "REAL";
+    :};
+    
+tipo ::= STRING 
+    {: 
+        System.out.println("[Regla 7] Tipo string");
+        RESULT = "STRING";
+    :};
+
+programa ::= programa:p sentencia:s 
+    {: 
+        System.out.println("[Regla 8] Programa con sentencia");
+        RESULT = p;
+    :};
+    
+programa ::= sentencia:s 
+    {: 
+        System.out.println("[Regla 9] Programa con sentencia unica");
+        RESULT = s;
+    :};
+
+sentencia ::= mostrar
+    {: 
+        System.out.println("[Regla 52] Mostrar");
+    :};
+
+
+sentencia ::= asignacion:a 
+    {: 
+        System.out.println("[Regla 10] Sentencia de asignacion");
+        RESULT = a;
+    :};
+    
+sentencia ::= iteracion:i 
+    {: 
+        System.out.println("[Regla 11] Sentencia de iteracion");
+        RESULT = i;
+    :};
+    
+sentencia ::= seleccion:sel 
+    {: 
+        System.out.println("[Regla 12] Sentencia de seleccion");
+        RESULT = sel;
+    :};
+
+asignacion ::= ID:id ASIGNAR expresion:e
+    {: 
+        System.out.println("[Regla 13] Asignacion: " + id + " = " + e);
+        RESULT = String.valueOf(e);
+    :};
+    
+seleccion ::= IF condicion:c THEN programa:p END IF 
+    {: 
+        System.out.println("[Regla 14] if sin else");
+        RESULT = p;
+    :};
+    
+seleccion ::= IF condicion:c THEN programa:p1 ELSE programa:p2 END IF 
+    {: 
+        System.out.println("[Regla 15] if con else");
+        RESULT = p1;
+    :};
+    
+iteracion ::= REPEAT programa:p WHILE condicion:c END 
+    {: 
+        System.out.println("[Regla 16] Sentencia repeat");
+        RESULT = p;
+    :};
+
+condicion ::= comparacion:comp 
+    {: 
+        System.out.println("[Regla 17] Condicion comparacion");
+        RESULT = comp;
+    :};
+    
+condicion ::= comparacion:c1 AND comparacion:c2 
+    {: 
+        System.out.println("[Regla 18] Condicion AND");
+        RESULT = String.valueOf(c1) + " AND " + String.valueOf(c2);
+    :};
+    
+condicion ::= comparacion:c1 OR comparacion:c2 
+    {: 
+        System.out.println("[Regla 19] Condicion OR");
+        RESULT = String.valueOf(c1) + " OR " + String.valueOf(c2);
+    :};
+
+lista_expresiones ::= lista_expresiones:le PYC expresion:e 
+    {: 
+        System.out.println("[Regla 20] Lista de expresiones");
+        RESULT = le;
+    :};
+    
+lista_expresiones ::= expresion:e 
+    {: 
+        System.out.println("[Regla 21] Expresion");
+        RESULT = e;
+    :};
+
+lista_valores ::= ACORCHETE lista_expresiones:le CCORCHETE 
+    {: 
+        System.out.println("[Regla 22] Lista de valores");
+        RESULT = le;
+    :};
+
+comparacion ::= expresion:e1 comparador:comp expresion:e2 
+    {: 
+        System.out.println("[Regla 23] Comparacion: " + e1 + " " + comp + " " + e2);
+        RESULT = String.valueOf(e1) + String.valueOf(comp) + String.valueOf(e2);
+    :};
+    
+comparacion ::= INLIST APARENT ID:id COMA lista_valores:lv CPARENT 
+    {: 
+        System.out.println("[Regla 24] Funcion Inlist(" + id + ", " + lv + ")");
+        RESULT = "INLIST(" + id + ")";
+    :};
+
+comparador ::= MENOR 
+    {: 
+        System.out.println("[Regla 25] Comparador <");
+        RESULT = "<";
+    :};
+    
+comparador ::= MENORIGUAL 
+    {: 
+        System.out.println("[Regla 26] Comparador <=");
+        RESULT = "<=";
+    :};
+    
+comparador ::= MAYOR 
+    {: 
+        System.out.println("[Regla 27] Comparador >");
+        RESULT = ">";
+    :};
+    
+comparador ::= MAYORIGUAL 
+    {: 
+        System.out.println("[Regla 28] Comparador >=");
+        RESULT = ">=";
+    :};
+    
+comparador ::= IGUAL 
+    {: 
+        System.out.println("[Regla 29] Comparador ==");
+        RESULT = "==";
+    :};
+    
+comparador ::= DISTINTO 
+    {: 
+        System.out.println("[Regla 30] Comparador !=");
+        RESULT = "!=";
+    :};
+
+expresion ::= expresion:e SUMA termino:t 
+    {: 
+        System.out.println("[Regla 31] E + T = " + e + " + " + t);
+        RESULT = String.valueOf(e) + "+" + String.valueOf(t);
+    :};
+    
+expresion ::= expresion:e MENOS termino:t 
+    {: 
+        System.out.println("[Regla 32] E - T = " + e + " - " + t);
+        RESULT = String.valueOf(e) + "-" + String.valueOf(t);
+    :};
+    
+expresion ::= termino:t 
+    {: 
+        System.out.println("[Regla 33] Termino = " + t);
+        RESULT = t;
+    :};
+
+termino ::= termino:t MULT factor:f 
+    {: 
+        System.out.println("[Regla 34] T * F = " + t + " * " + f);
+        RESULT = String.valueOf(t) + "*" + String.valueOf(f);
+    :};
+    
+termino ::= termino:t DIV factor:f 
+    {: 
+        System.out.println("[Regla 35] T / F = " + t + " / " + f);
+        RESULT = String.valueOf(t) + "/" + String.valueOf(f);
+    :};
+    
+termino ::= factor:f 
+    {: 
+        System.out.println("[Regla 36] Factor = " + f);
+        RESULT = f;
+    :};
+
+factor ::= ID:id 
+    {: 
+        System.out.println("[Regla 37] Variable valor = " + id);
+        RESULT = id;
+    :};
+    
+factor ::= C_INT:ent 
+    {: 
+        System.out.println("[Regla 38] Constante entera valor = " + ent);
+        RESULT = ent;
+    :};
+    
+factor ::= C_REAL:real 
+    {: 
+        System.out.println("[Regla 39] Constante real valor = " + real);
+        RESULT = real;
+    :};
+    
+factor ::= HEX:h 
+    {: 
+        System.out.println("[Regla 40] Constante hexadecimal valor = " + h);
+        RESULT = h;
+    :};
+    
+factor ::= APARENT expresion:e CPARENT 
+    {: 
+        System.out.println("[Regla 41] Parentesis expresion parentesis = (" + e + ")");
+        RESULT = "(" + e + ")";
+    :};
+
+
+mostrar ::= MOSTRAR APARENT ID:id CPARENT  
+    {: 
+        System.out.println("[Regla 47] Mostrar ID = " + id);
+        RESULT = String.valueOf(id);
+    :};
+    
+mostrar ::= MOSTRAR APARENT C_INT:ent CPARENT  
+    {: 
+        System.out.println("[Regla 48] Mostrar C_INT = " + ent);
+        RESULT = String.valueOf(ent);
+    :};
+    
+mostrar ::= MOSTRAR APARENT C_REAL:real CPARENT  
+    {: 
+        System.out.println("[Regla 49] Mostrar C_REAL = " + real);
+        RESULT = String.valueOf(real);
+    :};
+    
+mostrar ::= MOSTRAR APARENT C_STRING:str CPARENT  
+    {: 
+        System.out.println("[Regla 50] Mostrar C_STRING = " + str);
+        RESULT = String.valueOf(str);
+    :};
+    
+mostrar ::= MOSTRAR APARENT HEX:h CPARENT  
+    {: 
+        System.out.println("[Regla 51] Mostrar HEX = " + h);
+        RESULT = String.valueOf(h);
+    :};
