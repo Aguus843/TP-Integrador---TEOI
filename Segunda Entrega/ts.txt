@@ -1,0 +1,10 @@
+NOMBRE | TOKEN | TIPO | VALOR | LONG
+A | ID | INT | null | 0
+B | ID | INT | null | 0
+_1 | C_INT | - | 1 | 0
+_0 | C_INT | - | 0 | 0
+_15 | C_INT | - | 15 | 0
+_25 | C_INT | - | 25 | 0
+_35 | C_INT | - | 35 | 0
+_10 | C_INT | - | 10 | 0
+_50 | C_INT | - | 50 | 0
