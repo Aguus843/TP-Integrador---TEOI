@@ -6,6 +6,8 @@ import java_cup.runtime.*;
 
 parser code
 {:
+    public static TablaSimbolos TS = new TablaSimbolos();
+
     /** Metodo llamado automáticamente ante un error sintáctico. */
     public void syntax_error(Symbol s){
         System.out.println("Error en la linea " + (s.right+1) + " columna " + s.left + ". "
@@ -100,6 +102,9 @@ lista_decl ::= decl:d
 decl ::= ID:id DOSPUNTOS tipo:t 
     {: 
         System.out.println("[Regla 4] Declaracion de variable: " + id + " : " + t);
+        
+        TS.agregar(id.toString(), "ID", t.toString(), null, 0);
+        
         RESULT = id;
     :};
 
@@ -160,6 +165,9 @@ sentencia ::= seleccion:sel
 asignacion ::= ID:id ASIGNAR expresion:e
     {: 
         System.out.println("[Regla 13] Asignacion: " + id + " = " + e);
+        
+        Simbolo s = TS.buscar(id.toString());
+        
         RESULT = String.valueOf(e);
     :};
     
@@ -310,18 +318,33 @@ factor ::= ID:id
 factor ::= C_INT:ent 
     {: 
         System.out.println("[Regla 38] Constante entera valor = " + ent);
+        TS.agregar("_" + ent.toString(), "C_INT", "-", ent, 0);
+
         RESULT = ent;
     :};
     
 factor ::= C_REAL:real 
     {: 
         System.out.println("[Regla 39] Constante real valor = " + real);
+        TS.agregar("_" + real.toString(), "C_REAL", "-", real, 0);
+        
         RESULT = real;
     :};
     
+factor ::= C_STRING:str
+    {: 
+        String texto = str.toString();
+        String contenido = texto.substring(1, texto.length() - 1); // quitar comillas
+
+        System.out.println("[Regla 53] Constante string valor = " + str);
+        TS.agregar("_" + contenido, "C_STRING", "-", contenido, contenido.length());
+        RESULT = str;
+    :};
+
 factor ::= HEX:h 
     {: 
         System.out.println("[Regla 40] Constante hexadecimal valor = " + h);
+        TS.agregar("_" + h.toString(), "HEX", "-", h, 0);
         RESULT = h;
     :};
     
