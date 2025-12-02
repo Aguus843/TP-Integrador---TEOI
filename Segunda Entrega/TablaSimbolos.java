@@ -6,11 +6,13 @@ import java.io.*;
 public class TablaSimbolos {
     private LinkedHashMap<String, Simbolo> tabla = new LinkedHashMap<>();
 
-    public void agregar(String nombre, String token, Object valor, int longitud) {
+    public void agregar(String nombre, String token, String tipo, Object valor, int longitud) {
         if (!tabla.containsKey(nombre)) {
-            tabla.put(nombre, new Simbolo(nombre, token, null, valor, longitud));
+            tabla.put(nombre, new Simbolo(nombre, token, tipo, valor, longitud));
         }
     }
+
+
 
     public Simbolo buscar(String nombre) {
         return tabla.get(nombre);

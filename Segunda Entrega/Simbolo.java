@@ -4,7 +4,7 @@ package lexicoparte1;
 public class Simbolo {
     public String nombre;
     public String token;
-    public String tipo;      // null por ahora
+    public String tipo;
     public Object valor;     // usado solo para constantes
     public int longitud;     // usado solo para strings
 
