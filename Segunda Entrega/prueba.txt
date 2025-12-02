@@ -1,0 +1,12 @@
+DECVAR
+    A : INT
+    B : INT
+ENDDECVAR
+A = 1
+B = 0
+REPEAT
+    A = A + 1
+    IF INLIST(A, [15; 25; 35]) THEN
+        B = B + 10
+    END IF
+WHILE A < 50 END
